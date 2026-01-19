@@ -165,7 +165,7 @@
       .overall {
         margin-top: 14px;
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 10px;
       }
       @media (max-width: 980px) {
@@ -203,10 +203,6 @@
       </header>
 
       <section class="overall">
-        <div class="stat card">
-          <p class="k">Total downloaded (AVC + HEVC)</p>
-          <p class="v" id="totalMb">0.00 MB</p>
-        </div>
         <div class="stat card">
           <p class="k">Savings (HEVC vs AVC)</p>
           <p class="v" id="savingsMb">0.00 MB</p>
@@ -283,9 +279,6 @@
       function updateUi() {
         el("avcMb").textContent = fmtMb(bytesAvc);
         el("hevcMb").textContent = fmtMb(bytesHevc);
-
-        const total = bytesAvc + bytesHevc;
-        el("totalMb").textContent = fmtMb(total);
 
         const savings = Math.max(0, bytesAvc - bytesHevc);
         el("savingsMb").textContent = fmtMb(savings);
