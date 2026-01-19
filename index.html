@@ -79,28 +79,6 @@
         color: var(--text);
         outline: none;
       }
-      .codec-selector {
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .codec-selector label {
-        font-size: 14px;
-        color: var(--muted);
-      }
-      select {
-        padding: 10px 12px;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        background: rgba(0, 0, 0, 0.12);
-        color: var(--text);
-        outline: none;
-        cursor: pointer;
-      }
-      select:hover {
-        border-color: rgba(125, 211, 252, 0.5);
-      }
       .coverage-control {
         margin-top: 10px;
         display: flex;
@@ -241,13 +219,6 @@
           <button id="loadBtn">Load</button>
           <button id="resetBtn" title="Resets counters (does not clear browser cache)">Reset Counters</button>
         </div>
-        <div class="codec-selector">
-          <label for="codecSelect">Modern Codec:</label>
-          <select id="codecSelect">
-            <option value="hevc">HEVC (H.265)</option>
-            <option value="av1">AV1</option>
-          </select>
-        </div>
         <div class="coverage-control">
           <label for="coverageInput">Device Coverage (<span id="coverageCodecName">HEVC</span>-capable):</label>
           <input id="coverageInput" type="number" min="0" max="100" value="33" step="1" />
@@ -345,7 +316,7 @@
       let playerAvc, playerModern;
       let bytesAvc = 0;
       let bytesModern = 0;
-      let currentCodec = "hevc";
+      let currentCodec = "hevc"; // Will be auto-detected
 
       function updateCodecLabels() {
         const config = CODEC_CONFIG[currentCodec];
@@ -439,6 +410,41 @@
         wireVariantUi(playerModern, "modernVariant");
       }
 
+      async function detectCodec(url) {
+        // Create a temporary player to detect available codecs
+        const tempVideo = document.createElement("video");
+        const tempPlayer = new shaka.Player(tempVideo);
+        
+        try {
+          await tempPlayer.load(url);
+          const tracks = tempPlayer.getVariantTracks();
+          
+          // Check for AV1 first (prefer newer codec)
+          const hasAv1 = tracks.some(t => t.videoCodec && (t.videoCodec.includes("av01") || t.videoCodec.includes("av1")));
+          if (hasAv1) {
+            await tempPlayer.unload();
+            return "av1";
+          }
+          
+          // Check for HEVC
+          const hasHevc = tracks.some(t => t.videoCodec && (t.videoCodec.includes("hvc1") || t.videoCodec.includes("hev1") || t.videoCodec.includes("hevc")));
+          if (hasHevc) {
+            await tempPlayer.unload();
+            return "hevc";
+          }
+          
+          await tempPlayer.unload();
+          // Default to HEVC if neither found
+          return "hevc";
+        } catch (e) {
+          try {
+            await tempPlayer.unload();
+          } catch {}
+          // Default to HEVC on error
+          return "hevc";
+        }
+      }
+
       async function loadManifest(url) {
         const u = (url || "").trim();
         if (!u) {
@@ -454,6 +460,9 @@
           // ignore
         }
 
+        // Auto-detect codec from manifest
+        currentCodec = await detectCodec(u);
+        updateCodecLabels();
         configurePlayers();
         await Promise.all([playerAvc.load(u), playerModern.load(u)]);
       }
@@ -462,17 +471,6 @@
         bytesAvc = 0;
         bytesModern = 0;
         updateUi();
-      }
-
-      async function onCodecChange() {
-        currentCodec = el("codecSelect").value;
-        updateCodecLabels();
-        const currentUrl = el("manifestUrl").value.trim();
-        if (currentUrl) {
-          await loadManifest(currentUrl);
-        } else {
-          configurePlayers();
-        }
       }
 
       (async function main() {
@@ -489,7 +487,6 @@
         el("loadBtn").addEventListener("click", async () => loadManifest(el("manifestUrl").value));
         el("resetBtn").addEventListener("click", resetCounters);
         el("coverageInput").addEventListener("input", updateUi);
-        el("codecSelect").addEventListener("change", onCodecChange);
 
         if (initial) {
           await loadManifest(initial);
