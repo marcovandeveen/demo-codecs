@@ -70,7 +70,7 @@
         align-items: center;
       }
       input[type="url"] {
-        width: 100%;
+        min-width: 0;
         padding: 10px 12px;
         border-radius: 10px;
         border: 1px solid var(--border);
@@ -265,8 +265,7 @@
 
     <script>
       // Default stream (can be overridden via ?manifest=...).
-      const DEFAULT_MANIFEST_URL =
-        "https://renditions-cloudfront.jwpsrv.com/696e5371_8e460a16ca689acbf455ec64386ca807aed98a95/sites/TXXJgKqJ/media/BMlhWwAx/versions/QoHU0nMb/custom_manifest.ism/.m3u8";
+      const DEFAULT_MANIFEST_URL = "";
 
       const el = (id) => document.getElementById(id);
       const fmtMb = (bytes) => `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
