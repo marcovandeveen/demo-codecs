@@ -412,10 +412,9 @@
         }
         el("sessionSavingsMb").textContent = fmtMb(sessionSavingsBytes);
         
-        // Update all sessions savings (with coverage applied)
+        // Update all sessions savings (display total accumulated)
         const allSessionsBytes = getAllSessionsSavings();
-        const allSessionsWithCoverage = allSessionsBytes * coverageDecimal;
-        el("allSessionsSavingsMb").textContent = fmtMb(allSessionsWithCoverage);
+        el("allSessionsSavingsMb").textContent = fmtMb(allSessionsBytes);
         el("allSessionsCoverageDisplay").textContent = Math.round(coverage);
       }
 
