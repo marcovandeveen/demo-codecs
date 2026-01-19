@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AVC vs Modern Codec Bandwidth Demo (1080p)</title>
+    <title>AVC vs HEVC Bandwidth Demo (1080p)</title>
     <style>
       :root {
         color-scheme: light dark;
@@ -69,8 +69,7 @@
         gap: 10px;
         align-items: center;
       }
-      input[type="url"],
-      input[type="number"] {
+      input[type="url"] {
         width: 100%;
         padding: 10px 12px;
         border-radius: 10px;
@@ -78,24 +77,6 @@
         background: rgba(0, 0, 0, 0.12);
         color: var(--text);
         outline: none;
-      }
-      .coverage-control {
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .coverage-control label {
-        font-size: 14px;
-        color: var(--muted);
-      }
-      .coverage-control input[type="number"] {
-        width: 80px;
-        text-align: center;
-      }
-      .coverage-control span {
-        color: var(--muted);
-        font-size: 14px;
       }
       button {
         padding: 10px 12px;
@@ -184,45 +165,13 @@
       .overall {
         margin-top: 14px;
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 10px;
       }
       @media (max-width: 980px) {
         .overall {
           grid-template-columns: 1fr;
         }
-      }
-      .savings-tracking {
-        margin-top: 14px;
-      }
-      .tracking-stats {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      @media (max-width: 980px) {
-        .tracking-stats {
-          grid-template-columns: 1fr;
-        }
-      }
-      .tracking-stat {
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 10px;
-        background: rgba(0, 0, 0, 0.08);
-      }
-      .clear-btn {
-        padding: 4px 8px;
-        font-size: 12px;
-        border-radius: 6px;
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.06);
-        color: var(--text);
-        cursor: pointer;
-      }
-      .clear-btn:hover {
-        border-color: rgba(255, 100, 100, 0.6);
-        background: rgba(255, 100, 100, 0.1);
       }
       .note {
         margin-top: 10px;
@@ -241,7 +190,7 @@
   <body>
     <div class="wrap">
       <header>
-        <h1>AVC vs Modern Codec Bandwidth Demo (1080p)</h1>
+        <h1>AVC vs HEVC Bandwidth Demo (1080p)</h1>
         <p class="sub">
           This page loads the <b>same stream twice</b> and forces each player to prefer a different codec, then shows the
           <b>total bandwidth consumed (MB)</b> per player and combined.
@@ -251,51 +200,16 @@
           <button id="loadBtn">Load</button>
           <button id="resetBtn" title="Resets counters (does not clear browser cache)">Reset Counters</button>
         </div>
-        <div class="coverage-control">
-          <label for="coverageInput">Device Coverage (<span id="coverageCodecName">HEVC</span>-capable):</label>
-          <input id="coverageInput" type="number" min="0" max="100" value="33" step="1" />
-          <span>%</span>
-        </div>
       </header>
 
-      <section class="savings-tracking">
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="margin: 0; font-size: 14px; font-weight: 650;">Current Session</h3>
-          </div>
-          <div class="tracking-stats">
-            <div class="tracking-stat">
-              <span class="k">Savings (<span id="savingsCodecName">HEVC</span> vs AVC)</span>
-              <p class="v" id="savingsMb">0.00 MB</p>
-            </div>
-            <div class="tracking-stat">
-              <span class="k">Savings %</span>
-              <p class="v" id="savingsPct">0.0%</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section class="overall">
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="margin: 0; font-size: 14px; font-weight: 650;">Overall Savings (with Device Coverage)</h3>
-          </div>
-          <div class="tracking-stats">
-            <div class="tracking-stat">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span class="k">This Session (at <span id="coverageDisplay">33</span>% coverage)</span>
-              </div>
-              <p class="v" id="savingsAtCoverageMb">0.00 MB</p>
-            </div>
-            <div class="tracking-stat">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span class="k">All Sessions (at <span id="allSessionsCoverageDisplay">33</span>% coverage)</span>
-                <button id="clearAllBtn" class="clear-btn" title="Clear all accumulated savings">Clear</button>
-              </div>
-              <p class="v" id="allSessionsSavingsMb">0.00 MB</p>
-            </div>
-          </div>
+        <div class="stat card">
+          <p class="k">Savings (HEVC vs AVC)</p>
+          <p class="v" id="savingsMb">0.00 MB</p>
+        </div>
+        <div class="stat card">
+          <p class="k">Savings %</p>
+          <p class="v" id="savingsPct">0.0%</p>
         </div>
       </section>
 
@@ -319,17 +233,17 @@
 
         <div class="card">
           <h2>
-            <span id="modernCodecName">HEVC</span> Player <span class="pill" id="modernCodecPill">Prefer codecs: <code>hvc1</code>/<code>hev1</code></span>
+            HEVC Player <span class="pill">Prefer codecs: <code>hvc1</code>/<code>hev1</code></span>
           </h2>
-          <video id="videoModern" controls muted playsinline autoplay></video>
+          <video id="videoHevc" controls muted playsinline autoplay></video>
           <div class="stats">
             <div class="stat">
               <p class="k">Downloaded</p>
-              <p class="v" id="modernMb">0.00 MB</p>
+              <p class="v" id="hevcMb">0.00 MB</p>
             </div>
             <div class="stat">
               <p class="k">Selected Variant</p>
-              <p class="v" id="modernVariant">—</p>
+              <p class="v" id="hevcVariant">—</p>
             </div>
           </div>
         </div>
@@ -339,7 +253,7 @@
         Tips:
         <ul>
           <li>
-            For best results, use a manifest that includes <b>both AVC and the selected modern codec (HEVC/AV1) 1080p</b> variants (same ladder). This
+            For best results, use a manifest that includes <b>both AVC and HEVC 1080p</b> variants (same ladder). This
             demo will then show the byte savings clearly.
           </li>
           <li>
@@ -358,69 +272,17 @@
       const fmtMb = (bytes) => `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
       const fmtPct = (x) => `${(x * 100).toFixed(1)}%`;
 
-      const CODEC_CONFIG = {
-        hevc: {
-          name: "HEVC",
-          codecs: ["hvc1", "hev1"],
-          pill: 'Prefer codecs: <code>hvc1</code>/<code>hev1</code>',
-        },
-        av1: {
-          name: "AV1",
-          codecs: ["av01"],
-          pill: 'Prefer codecs: <code>av01</code>',
-        },
-      };
-
-      let playerAvc, playerModern;
+      let playerAvc, playerHevc;
       let bytesAvc = 0;
-      let bytesModern = 0;
-      let currentCodec = "hevc"; // Will be auto-detected
-
-      function getAllSessionsSavings() {
-        const stored = localStorage.getItem("allSessionsSavingsBytes");
-        return stored ? parseFloat(stored) : 0;
-      }
-
-      function saveAllSessionsSavings(bytes) {
-        localStorage.setItem("allSessionsSavingsBytes", bytes.toString());
-      }
-
-      function addToAllSessionsSavings(bytes) {
-        const current = getAllSessionsSavings();
-        saveAllSessionsSavings(current + bytes);
-      }
-
-      function updateCodecLabels() {
-        const config = CODEC_CONFIG[currentCodec];
-        el("modernCodecName").textContent = config.name;
-        el("modernCodecPill").innerHTML = config.pill;
-        el("savingsCodecName").textContent = config.name;
-        el("coverageCodecName").textContent = config.name;
-      }
+      let bytesHevc = 0;
 
       function updateUi() {
         el("avcMb").textContent = fmtMb(bytesAvc);
-        el("modernMb").textContent = fmtMb(bytesModern);
+        el("hevcMb").textContent = fmtMb(bytesHevc);
 
-        // Current session savings (raw)
-        const savings = Math.max(0, bytesAvc - bytesModern);
+        const savings = Math.max(0, bytesAvc - bytesHevc);
         el("savingsMb").textContent = fmtMb(savings);
         el("savingsPct").textContent = bytesAvc > 0 ? fmtPct(savings / bytesAvc) : "0.0%";
-
-        // Coverage calculation
-        const coverage = parseFloat(el("coverageInput").value) || 0;
-        const coverageDecimal = Math.max(0, Math.min(100, coverage)) / 100;
-
-        // This session savings with coverage applied
-        const savingsAtCoverage = savings * coverageDecimal;
-        el("savingsAtCoverageMb").textContent = fmtMb(savingsAtCoverage);
-        el("coverageDisplay").textContent = Math.round(coverage);
-
-        // All sessions savings with coverage applied
-        const allSessionsBytes = getAllSessionsSavings();
-        const allSessionsWithCoverage = allSessionsBytes * coverageDecimal;
-        el("allSessionsSavingsMb").textContent = fmtMb(allSessionsWithCoverage);
-        el("allSessionsCoverageDisplay").textContent = Math.round(coverage);
       }
 
       function attachByteCounter(player, which) {
@@ -430,7 +292,7 @@
           const b = response && response.data ? response.data.byteLength : 0;
           if (!b) return;
           if (which === "avc") bytesAvc += b;
-          else bytesModern += b;
+          else bytesHevc += b;
           updateUi();
         });
       }
@@ -450,8 +312,20 @@
         setTimeout(render, 250);
       }
 
-      function configurePlayers() {
-        if (!playerAvc || !playerModern) return;
+      async function initPlayers() {
+        if (!shaka.Player.isBrowserSupported()) {
+          alert("Shaka Player: browser not supported.");
+          return;
+        }
+
+        const videoAvc = el("videoAvc");
+        const videoHevc = el("videoHevc");
+
+        playerAvc = new shaka.Player(videoAvc);
+        playerHevc = new shaka.Player(videoHevc);
+
+        attachByteCounter(playerAvc, "avc");
+        attachByteCounter(playerHevc, "hevc");
 
         // Prefer 1080p by capping max height (keeps the demo stable for sales).
         const baseCfg = {
@@ -464,67 +338,13 @@
           preferredVideoCodecs: ["avc1"],
         });
 
-        const config = CODEC_CONFIG[currentCodec];
-        playerModern.configure({
+        playerHevc.configure({
           ...baseCfg,
-          preferredVideoCodecs: config.codecs,
+          preferredVideoCodecs: ["hvc1", "hev1"],
         });
-      }
-
-      async function initPlayers() {
-        if (!shaka.Player.isBrowserSupported()) {
-          alert("Shaka Player: browser not supported.");
-          return;
-        }
-
-        const videoAvc = el("videoAvc");
-        const videoModern = el("videoModern");
-
-        playerAvc = new shaka.Player(videoAvc);
-        playerModern = new shaka.Player(videoModern);
-
-        attachByteCounter(playerAvc, "avc");
-        attachByteCounter(playerModern, "modern");
-
-        configurePlayers();
 
         wireVariantUi(playerAvc, "avcVariant");
-        wireVariantUi(playerModern, "modernVariant");
-      }
-
-      async function detectCodec(url) {
-        // Create a temporary player to detect available codecs
-        const tempVideo = document.createElement("video");
-        const tempPlayer = new shaka.Player(tempVideo);
-        
-        try {
-          await tempPlayer.load(url);
-          const tracks = tempPlayer.getVariantTracks();
-          
-          // Check for AV1 first (prefer newer codec)
-          const hasAv1 = tracks.some(t => t.videoCodec && (t.videoCodec.includes("av01") || t.videoCodec.includes("av1")));
-          if (hasAv1) {
-            await tempPlayer.unload();
-            return "av1";
-          }
-          
-          // Check for HEVC
-          const hasHevc = tracks.some(t => t.videoCodec && (t.videoCodec.includes("hvc1") || t.videoCodec.includes("hev1") || t.videoCodec.includes("hevc")));
-          if (hasHevc) {
-            await tempPlayer.unload();
-            return "hevc";
-          }
-          
-          await tempPlayer.unload();
-          // Default to HEVC if neither found
-          return "hevc";
-        } catch (e) {
-          try {
-            await tempPlayer.unload();
-          } catch {}
-          // Default to HEVC on error
-          return "hevc";
-        }
+        wireVariantUi(playerHevc, "hevcVariant");
       }
 
       async function loadManifest(url) {
@@ -537,37 +357,22 @@
         // Stop previous playback (if any) to keep counters stable.
         try {
           await playerAvc.unload();
-          await playerModern.unload();
+          await playerHevc.unload();
         } catch (e) {
           // ignore
         }
 
-        // Auto-detect codec from manifest
-        currentCodec = await detectCodec(u);
-        updateCodecLabels();
-        configurePlayers();
-        await Promise.all([playerAvc.load(u), playerModern.load(u)]);
+        await Promise.all([playerAvc.load(u), playerHevc.load(u)]);
       }
 
       function resetCounters() {
-        // Accumulate current session savings to all sessions before resetting
-        const currentSavings = Math.max(0, bytesAvc - bytesModern);
-        if (currentSavings > 0) {
-          addToAllSessionsSavings(currentSavings);
-        }
         bytesAvc = 0;
-        bytesModern = 0;
-        updateUi();
-      }
-
-      function clearAllSessionsSavings() {
-        saveAllSessionsSavings(0);
+        bytesHevc = 0;
         updateUi();
       }
 
       (async function main() {
         await initPlayers();
-        updateCodecLabels();
 
         const params = new URLSearchParams(location.search);
         const fromQs = params.get("manifest");
@@ -578,8 +383,6 @@
 
         el("loadBtn").addEventListener("click", async () => loadManifest(el("manifestUrl").value));
         el("resetBtn").addEventListener("click", resetCounters);
-        el("coverageInput").addEventListener("input", updateUi);
-        el("clearAllBtn").addEventListener("click", clearAllSessionsSavings);
 
         if (initial) {
           await loadManifest(initial);
@@ -588,4 +391,3 @@
     </script>
   </body>
 </html>
-
