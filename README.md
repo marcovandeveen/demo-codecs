@@ -14,6 +14,14 @@ python3 -m http.server 8000
 
 Then open `http://localhost:8000/index.html`.
 
+## GitHub Pages
+
+This repo includes a GitHub Actions workflow that deploys the repository root (the `index.html`) to **GitHub Pages** on every push to `main`.
+
+After the first push, enable Pages in GitHub:
+
+- Repo → **Settings** → **Pages** → **Build and deployment** → **Source: GitHub Actions**
+
 ## Configure the default stream
 
 Edit `DEFAULT_MANIFEST_URL` in `index.html`, or launch with:
